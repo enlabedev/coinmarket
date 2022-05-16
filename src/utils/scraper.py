@@ -8,7 +8,7 @@ import lxml.html as html
 import json
 
 # Constants created in another file
-from constants import HOME_URL, XPATH_BITCOIN_PAGE, XPATH_NODES, VALUES_LIST, SAVED_JSON, TEMPORARY_JSON
+from src.utils.constants import HOME_URL, XPATH_BITCOIN_PAGE, XPATH_NODES, VALUES_LIST, SAVED_JSON, TEMPORARY_JSON
 
 
 # Menu to select an option
@@ -44,8 +44,8 @@ def print_data():
     actual_dir = os.listdir(pathlib.Path.cwd())
     if SAVED_JSON in actual_dir:
         with open(SAVED_JSON, 'r') as f:
-            data_to_print = json.load(f)
-            print(f'Saved data: \n {json.dumps(data_to_print, indent=4)}')
+            return json.load(f)
+
     else:
         print('There is no data saved yet!')
 
@@ -119,9 +119,9 @@ def parse_bitcoin(link):
         print(ve)
 
 
-def parse_home():
+def parse_home(link):
     """Function to obtain Bitcoin page link"""
-    response = requests.get(HOME_URL)
+    response = requests.get(link)
     try:
         if response.status_code == 200:
             home = response.content.decode('utf-8')
@@ -140,13 +140,15 @@ def run():
     """Controls the flow of the program"""
     option = menu()
     if option == 1:
-        link_to_bitcoin_page = parse_home()
+        link_to_bitcoin_page = parse_home(HOME_URL)
         data = parse_bitcoin(link_to_bitcoin_page)
         print_json(data)
         time = data['Obtained']
         save_data(data, time)
     elif option == 2:
-        print_data()
+        data_to_print = print_data()
+        print(f'Saved data: \n {json.dumps(data_to_print, indent=4)}')
+
     print('Thanks for using this program, come back later!')
 
 
